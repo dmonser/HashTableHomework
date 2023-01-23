@@ -1,29 +1,54 @@
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 public class Main {
     public static void main(String[] args) {
         String str = "Alibaba or Alibubab? I do not know!";
         char[] text = str.toCharArray();
+        ArrayList<Integer> pairs = search(text, "b*b");
+        System.out.println(pairs);
 
-        
-//        int testHash = getHash(text);
-//        System.out.println(testHash);
-//        int iPosition = getSymbolPosition(text, 'I');
-//        System.out.println(iPosition);
-//        search(text, "b*b");
     }
 
-    public static void search(char[] source, String pattern) {
+    public static ArrayList<Integer> search(char[] source, String pattern) {
         char[] patternArr = pattern.toCharArray();
+        int asterik_position = getSymbolPosition(patternArr, '*');
 
         if (source.length < patternArr.length) {
             System.out.println("Такой подстроки не существует!");
         }
-        int found;
-        int patternHash = getHash(patternArr);
+        ArrayList<Integer> found = new ArrayList<>();
+        int patternHash = getPatternHash(patternArr);
+        int windowHash = 0;
 
-
+        for (int start = 0; start < source.length - patternArr.length; start++) {
+            char[] checkArr = new char[]{source[start], source[start + 1], source[start + 2]};
+            if (start == 0) {
+                windowHash = getPatternHash(checkArr);
+                windowHash -= getSymbolHash(source[start + asterik_position]);
+            } else {
+                windowHash -= getSymbolHash(source[start - 1]);
+                windowHash += getSymbolHash(source[start + patternArr.length]);
+                windowHash += getSymbolHash(source[start - 1 + asterik_position]);
+            }
+            if (windowHash == patternHash){
+                int counter = 0;
+                for (int i = 0; i < patternArr.length; i++) {
+                    if (patternArr[i] != '*' && source[start + 1] != patternArr[i]){
+                        System.out.println("Позиция " + source[start] + " не подходит!");
+                        counter ++;
+                    }
+                }
+                if (counter == 0){
+                    found.add(start);
+                }
+            }
+            windowHash += getSymbolHash(source[start + asterik_position]);
+        }
+        return found;
     }
 
-    public static int getHash(char[] str){
+    public static int getPatternHash(char[] str){
         int hash = 0;
 
         for (char i : str) {
@@ -37,6 +62,11 @@ public class Main {
         }
 
         return hash;
+    }
+
+    public static int getSymbolHash(char symbol) {
+        String s = Character.toString(symbol);
+        return s.hashCode();
     }
 
     public static int getSymbolPosition(char[] pattern, char symbol){
