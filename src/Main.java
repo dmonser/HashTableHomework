@@ -28,18 +28,28 @@ public class Main {
                 windowHash -= getSymbolHash(source[start + asterik_position]);
             } else {
                 windowHash -= getSymbolHash(source[start - 1]);
-                windowHash += getSymbolHash(source[start + patternArr.length]);
-                windowHash += getSymbolHash(source[start - 1 + asterik_position]);
+                windowHash += getSymbolHash(source[start + patternArr.length - 1]);
+                windowHash -= getSymbolHash(source[start /*- 1*/ + asterik_position]);
             }
-            if (windowHash == patternHash){
+            if (windowHash == patternHash) {
                 int counter = 0;
                 for (int i = 0; i < patternArr.length; i++) {
-                    if (patternArr[i] != '*' && source[start + 1] != patternArr[i]){
-                        System.out.println("Позиция " + source[start] + " не подходит!");
-                        counter ++;
+//                    if (patternArr[i] != '*' && source[start + 1] != patternArr[i]){
+//                        System.out.println("Позиция " + start + " (" + source[start] + ") не подходит!");
+//                        counter ++;
+//                    }
+
+                    if (i == asterik_position) {
+                        continue;
+                    } else if (patternArr[i] == source[start + i]) {
+                        continue;
+                    } else {
+                        System.out.println("не подходит");
+                        counter++;
+                        break;
                     }
                 }
-                if (counter == 0){
+                if (counter == 0) {
                     found.add(start);
                 }
             }
@@ -48,7 +58,7 @@ public class Main {
         return found;
     }
 
-    public static int getPatternHash(char[] str){
+    public static int getPatternHash(char[] str) {
         int hash = 0;
 
         for (char i : str) {
@@ -69,11 +79,11 @@ public class Main {
         return s.hashCode();
     }
 
-    public static int getSymbolPosition(char[] pattern, char symbol){
+    public static int getSymbolPosition(char[] pattern, char symbol) {
         int position = -1;
 
         for (int i = 0; i < pattern.length; i++) {
-            if (pattern[i] == symbol){
+            if (pattern[i] == symbol) {
                 position = i;
                 break;
             } else {
